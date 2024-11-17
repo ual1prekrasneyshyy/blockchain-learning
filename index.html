@@ -18,18 +18,18 @@
                     <div class="card px-4 py-4 mt-4">
                         <div class="d-flex">
                             <div class="form-floating me-3">
-                                <select class="form-select" id="user_choice" aria-label="user_choice" name="user_choice">
+                                <select class="form-select" id="user_choice" aria-label="user_choice" name="user_choice" style="width: 120px;">
                                   <option value="0">Rock</option>
                                   <option value="2">Scissor</option>
                                   <option value="1">Paper</option>
                                 </select>
                                 <label for="user_choice">Select Item</label>
                             </div>
-                            <button onclick="playGame()" class="btn btn-success me-3">Play</button>
-                            <button onclick="getHistory()" class="btn btn-primary">Results</button>
+                            <button onclick="playGame()" class="btn btn-success me-3">Play Game</button>
+                            <button onclick="getHistory()" class="btn btn-primary">View History</button>
                         </div>
-                
                     </div>
+                    <div id="history"></div>
                 </div>
             </div>
         </div>

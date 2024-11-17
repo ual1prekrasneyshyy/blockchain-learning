@@ -30,5 +30,31 @@ async function playGame(){
 async function getHistory() {
     const results = await contract.getResultsHistory();
     console.log(results);
+
+    let pastedResult =
+        "<table class='table table-striped mt-4'>" +
+        "<thead class='table-warning'>" +
+        "<tr>" +
+        "<td>Your move</td>" +
+        "<td>Contract's move</td>" +
+        "<td>Yor result</td>" +
+        "</tr>" +
+        "</thead>" +
+        "<tbody>";
+
+    for (let i = 0; i < results.length; i++) {
+
+        pastedResult +=
+            "<tr>" +
+            "<td>" + results[i][0] + "</td>" +
+            "<td>" + results[i][1] + "</td>" +
+            "<td>" + results[i][2] + "</td>" +
+            "</tr>";
+    }
+
+    pastedResult += "</tbody>" +
+        "</table>";
+
+    document.getElementById("history").innerHTML = pastedResult;
     
 }
