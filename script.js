@@ -21,10 +21,35 @@ provider.send("eth_requestAccounts", []).then(() => {
 
 
 async function playGame(){
-    const userChoice = document.getElementById("user_choice").value;
-    const play = await contract.playGame(userChoice).send({
-        value: 10*1000000000
-    });
+
+    const userBet = document.getElementById("user_bet").value;
+
+    if(userBet > 10000){
+        const userChoice = document.getElementById("user_choice").value;
+        const amountToSend = ethers.utils.parseUnits(userBet, "gwei"); // 0.01 ETH - Adjust as needed
+
+        try {
+            const tx = await contract.playGame(userChoice, { value: amountToSend }); // Add {value}
+            console.log("Transaction hash:", tx.hash);
+            await tx.wait(); // Wait for confirmation
+            console.log("Transaction confirmed!");
+            getHistory(); //Update History after game
+        } catch (error) {
+            console.error("Error playing game:", error);
+            //Consider more user-friendly error handling, for example display an error message
+        }
+    }else{
+        let innerHtml =
+            "<div class='alert alert-warning pb-1 mt-3'>" +
+            "<blockquote>" +
+            "Your bet is <strong>" + userBet + "</strong> Gwei, though it should be <strong>at least 10000 Gwei</strong>" +
+            "</blockquote>" +
+            "</div>";
+
+        document.getElementById("warning").innerHTML = innerHtml;
+    }
+
+
 }
 
 async function getHistory() {
@@ -35,9 +60,10 @@ async function getHistory() {
         "<table class='table table-striped mt-4'>" +
         "<thead class='table-warning'>" +
         "<tr>" +
-        "<td>Your move</td>" +
-        "<td>Contract's move</td>" +
-        "<td>Yor result</td>" +
+        "<th>#</th>" +
+        "<th>Your move</th>" +
+        "<th>Contract's move</th>" +
+        "<th>Yor result</th>" +
         "</tr>" +
         "</thead>" +
         "<tbody>";
@@ -46,6 +72,7 @@ async function getHistory() {
 
         pastedResult +=
             "<tr>" +
+            "<td>" + (i+1) + "</td>" +
             "<td>" + results[i][0] + "</td>" +
             "<td>" + results[i][1] + "</td>" +
             "<td>" + results[i][2] + "</td>" +
