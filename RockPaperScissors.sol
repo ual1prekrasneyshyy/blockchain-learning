@@ -6,8 +6,8 @@ contract RockPaperScissors {
 
     //to store results
     struct Result {
-        Move userMove;
-        Move contractMove;
+        string userMove;
+        string contractMove;
         string result;
     }
 
@@ -28,42 +28,47 @@ contract RockPaperScissors {
     }
 
     // Function to play the game
-    function playGame(uint8 playerMove) public payable {
-        require(playerMove >= 1 && playerMove <= 3, "Invalid move. Choose: 0 - stone, 1 - scissors, 2 - paper");
+    function playGame(uint8 playerMoveCode) public payable {
+        require(playerMoveCode >= 0 && playerMoveCode <= 2, "Invalid move. Choose: 0 - stone, 1 - scissors, 2 - paper");
         require(msg.value >= minBet, "Bet must be at least 10,000 gwei");
 
         // Contract generates its move
         Move contractMove = Move(_getRandomNumber() % 3);
 
+        Move playerMove = Move(playerMoveCode);
+
         // Determine if the player wins
-        bool playerWins = _checkWin(Move(playerMove), contractMove);
+        bool playerWins = _checkWin(playerMove, contractMove);
 
         uint256 payout;
 
-        // Case of a draw
-        if (Move(playerMove) == contractMove) {
-            payout = msg.value; // Player gets their bet back
-            emit GameResult(msg.sender, _moveToString(Move(playerMove)), _moveToString(contractMove), false, payout);
+        string memory playerMoveString = _moveToString(playerMove);
+        string memory contractMoveString = _moveToString(contractMove);
 
-            results.push(Result(Move(playerMove), contractMove, "Draw"));
-        } 
-        // Case where the player wins
+        // Case of a draw
+        if (playerMove == contractMove) {
+            payout = msg.value; // Player gets their bet back
+            emit GameResult(msg.sender, playerMoveString, contractMoveString, false, payout);
+
+            results.push(Result(playerMoveString, contractMoveString, "Draw"));
+        }
+            // Case where the player wins
         else if (playerWins) {
             payout = msg.value * 2; // Player wins double their bet
             require(address(this).balance >= payout, "Not enough balance in the contract");
 
-            emit GameResult(msg.sender, _moveToString(Move(playerMove)), _moveToString(contractMove), true, payout);
+            emit GameResult(msg.sender, _moveToString(Move(playerMove)), contractMoveString, true, payout);
 
 
-            results.push(Result(Move(playerMove), contractMove, "Victory"));
-        } 
-        // Case where the player loses (no payout)
+            results.push(Result(playerMoveString, contractMoveString, "Victory"));
+        }
+            // Case where the player loses (no payout)
         else {
             payout = 0; // Player loses their bet
-            emit GameResult(msg.sender, _moveToString(Move(playerMove)), _moveToString(contractMove), false, payout);
+            emit GameResult(msg.sender, _moveToString(Move(playerMove)), contractMoveString, false, payout);
 
 
-            results.push(Result(Move(playerMove), contractMove, "Loss"));
+            results.push(Result(playerMoveString, contractMoveString, "Loss"));
         }
 
         // Process the payout if needed
